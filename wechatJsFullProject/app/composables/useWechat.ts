@@ -5,40 +5,36 @@ interface WechatConfig {
 
 const SDK_URL = 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js'
 
-interface WechatState {
-  isLoading: Ref<boolean>
-  isReady: Ref<boolean>
-  error: Ref<string | null>
+// 模块级单例 —— 路由切换后状态不丢失
+const isLoading = ref(false)
+const isReady = ref(false)
+const error = ref<string | null>(null)
+const initedApiList = ref<string[]>([])
+let loadPromise: Promise<void> | null = null
+
+function loadScript(): Promise<void> {
+  if (loadPromise) return loadPromise
+
+  loadPromise = new Promise((resolve, reject) => {
+    if (window.wx) {
+      resolve()
+      return
+    }
+    const script = document.createElement('script')
+    script.src = SDK_URL
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('加载微信 JS-SDK 失败'))
+    document.head.appendChild(script)
+  })
+  return loadPromise
 }
 
 /**
  * 微信 JS-SDK 核心 composable
  * 负责加载 SDK → 请求签名 → wx.config → 等待 wx.ready
+ * 状态为模块级单例，跨页面共享
  */
-export function useWechat(): WechatState & { initWechat: (config?: Partial<WechatConfig>) => Promise<void> } {
-  const isLoading = ref(false)
-  const isReady = ref(false)
-  const error = ref<string | null>(null)
-
-  let loadPromise: Promise<void> | null = null
-
-  function loadScript(): Promise<void> {
-    if (loadPromise) return loadPromise
-
-    loadPromise = new Promise((resolve, reject) => {
-      if (window.wx) {
-        resolve()
-        return
-      }
-      const script = document.createElement('script')
-      script.src = SDK_URL
-      script.onload = () => resolve()
-      script.onerror = () => reject(new Error('加载微信 JS-SDK 失败'))
-      document.head.appendChild(script)
-    })
-    return loadPromise
-  }
-
+export function useWechat() {
   async function initWechat(config?: Partial<WechatConfig>) {
     isLoading.value = true
     error.value = null
@@ -80,6 +76,7 @@ export function useWechat(): WechatState & { initWechat: (config?: Partial<Wecha
           clearTimeout(timeout)
           isReady.value = true
           isLoading.value = false
+          initedApiList.value = finalConfig.jsApiList
           resolve()
         })
 
@@ -97,9 +94,10 @@ export function useWechat(): WechatState & { initWechat: (config?: Partial<Wecha
   }
 
   return {
-    isLoading,
-    isReady,
-    error,
+    isLoading: readonly(isLoading),
+    isReady: readonly(isReady),
+    error: readonly(error),
+    initedApiList: readonly(initedApiList),
     initWechat,
   }
 }
