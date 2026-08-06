@@ -26,7 +26,11 @@
       </div>
       <button :disabled="!isReady" @click="handleSetShare">设置分享内容</button>
       <p v-if="shareError" class="err">{{ shareError }}</p>
-      <p class="hint">设置后，点击右上角 "..." 可查看分享效果</p>
+      <div v-if="shareSetted" class="guide-box">
+        <div class="guide-arrow">⬆</div>
+        <p class="guide-text">分享内容已生效</p>
+        <p class="guide-sub">点击右上角 <strong>"···"</strong> → 选择「发送给朋友」或「分享到朋友圈」</p>
+      </div>
     </section>
 
     <section :class="['card', { disabled: !isReady }]">
@@ -45,6 +49,7 @@ const { isReady } = useWechat()
 
 const { setShare, lastShareError: shareError } = useWechatShare()
 
+const shareSetted = ref(false)
 const shareConfig = reactive({
   title: '测试分享标题',
   desc: '测试分享描述',
@@ -54,6 +59,7 @@ const shareConfig = reactive({
 
 const handleSetShare = () => {
   setShare({ ...shareConfig })
+  shareSetted.value = true
 }
 
 onMounted(() => {
@@ -111,6 +117,18 @@ button:hover:not(:disabled) { background: #40a9ff; }
 
 .hint { font-size: 0.8rem; color: #999; margin: 8px 0 0; }
 .err { color: #ff4d4f; font-size: 0.85rem; margin: 8px 0 0; }
+
+.guide-box {
+  margin-top: 12px;
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 6px;
+  padding: 14px 16px;
+  text-align: center;
+}
+.guide-arrow { font-size: 1.5rem; }
+.guide-text { font-weight: 600; color: #1890ff; margin: 4px 0; }
+.guide-sub { font-size: 0.85rem; color: #555; margin: 0; line-height: 1.6; }
 
 .desc-list { padding-left: 18px; font-size: 0.9rem; line-height: 1.8; color: #666; }
 </style>

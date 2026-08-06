@@ -22,13 +22,9 @@
           <span class="loc-label">经度</span>
           <span class="loc-value">{{ location.longitude }}</span>
         </div>
-        <div class="loc-row">
+        <div v-if="location.accuracy" class="loc-row">
           <span class="loc-label">精度</span>
           <span class="loc-value">{{ location.accuracy }} 米</span>
-        </div>
-        <div class="loc-row">
-          <span class="loc-label">速度</span>
-          <span class="loc-value">{{ location.speed }} m/s</span>
         </div>
       </div>
 
@@ -38,9 +34,9 @@
     <section :class="['card', { disabled: !isReady }]">
       <h2>使用说明</h2>
       <ul class="desc-list">
-        <li>首次调用会弹出微信授权弹窗</li>
-        <li>使用 <code>wgs84</code> 坐标系（GPS 原始坐标）</li>
-        <li>在生产环境中建议将坐标上传到服务端进行业务处理</li>
+        <li>使用 <code>getFuzzyLocation</code> API，首次调用会弹出微信授权弹窗</li>
+        <li>返回 <code>wgs84</code> 坐标系的近似位置</li>
+        <li>如需精确定位需在公众号后台申请位置权限后使用 <code>getLocation</code></li>
       </ul>
     </section>
   </div>

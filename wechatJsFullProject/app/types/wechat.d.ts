@@ -58,6 +58,8 @@ interface Wx {
 
   getLocation(opts: WxApiCallback & { type?: string }): void
 
+  getFuzzyLocation(opts: WxApiCallback & { type?: string }): void
+
   openLocation(opts: WxApiCallback & {
     latitude: number; longitude: number
     name: string; address: string

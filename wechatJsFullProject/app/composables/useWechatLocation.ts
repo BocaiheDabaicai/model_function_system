@@ -1,8 +1,8 @@
 interface LocationResult {
   latitude: number
   longitude: number
-  speed: number
-  accuracy: number
+  speed?: number
+  accuracy?: number
 }
 
 interface OpenLocationConfig {
@@ -24,7 +24,7 @@ export function useWechatLocation() {
 
   function getLocation(): Promise<LocationResult> {
     return new Promise((resolve, reject) => {
-      window.wx.getLocation({
+      window.wx.getFuzzyLocation({
         type: 'wgs84',
         success: (res: LocationResult) => {
           currentLocation.value = res
@@ -68,6 +68,7 @@ export function useWechatLocation() {
  * 注册地理位置相关的 jsApiList
  */
 export const LOCATION_API_LIST = [
+  'getFuzzyLocation',
   'getLocation',
   'openLocation',
 ]
